@@ -2,3 +2,8 @@ Smplify v2.zip
 *.zip
 *.zip
 Smplify v2.zip
+
+# SMPL / SMPLify model files (licensed, download separately)
+smplify_public/code/models/*.pkl
+smplify_public/code/models/*.npz
+hmr2-smplify/data/*.pkl
