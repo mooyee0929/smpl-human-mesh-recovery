@@ -5,7 +5,7 @@ By using this software you agree to the terms of the SMPLify license here:
      http://smplify.is.tue.mpg.de/license
 
 ============
-Code is adapted for EECS 542 / CSE 598 HW5 in University of Michigan.
+Adapted from the SMPLify demo (fit_3d.py) to PyTorch, using the SMPL wrapper and renderer from HMR 2.0.
 """
 
 from os.path import join, exists, abspath, dirname
@@ -229,8 +229,7 @@ def initialize_camera(model,
     lr = 0.05
 
     #########################################################
-    # TODO Task 3.2
-    # General steps: 
+    # Camera initialization setup:
     # 1. Create a torch tensor called `cam_t` for the camera translation (from init_t),
     # and a torch tensor called `body_orient_aa` for the global body orientation in axis-angle.
     # The global body orientation should be initialized as zeros.
@@ -239,7 +238,6 @@ def initialize_camera(model,
     # 2. Next create a torch optimizer with the parameters [cam_t, body_orient_aa] and learning rate lr.
     # You can use the torch.optim.Adam.
     #########################################################
-    # Your code here.
     cam_t = torch.tensor(init_t.reshape(1, 3), 
                     dtype=torch.float32, 
                     device=DEVICE, 
@@ -258,8 +256,7 @@ def initialize_camera(model,
     j2d_torso_gt = torch.from_numpy(j2d[torso_src_ids].astype(np.float32)).to(DEVICE).unsqueeze(0)
     for i in range(1001):
         #########################################################
-        # TODO Task 3.2 (continued)
-        # General steps:
+        # Per-step camera optimization:
         # 1. Zero the gradients of the optimizer.
         # 2. Call smpl_t to get the 3D joints. Check out how we call it in guess_init() or in render_smpl_tpose.py.
         # You may find aa_to_rotmat() useful to convert axis-angle to rotation matrix.
@@ -271,7 +268,6 @@ def initialize_camera(model,
         # 4. Compute the reprojection loss called `loss_reproj` between the projected 2D joints and the ground truth 2D joints.
         # You can do so by calculating ((proj2D - j2d_torso_gt) ** 2).mean().
         #########################################################
-        # Your code here.
         optimizer.zero_grad()
 
         global_orient_rotmat = aa_to_rotmat(body_orient_aa.view(-1, 3)).view(1, 1, 3, 3)
@@ -408,8 +404,7 @@ def optimize_on_joints(j2d,
         mean_pose = np.zeros(69, dtype=np.float32)
 
     #########################################################
-    # TODO Task 3.4
-    # General steps:
+    # Joint weights and optimization variables:
     # 1. Compute joint-wise weights for the reprojection loss so we don't try 
     # to match joints with low confidence too much.
     # You can do so by multiplying the base weights by the confidence scores.
@@ -420,7 +415,6 @@ def optimize_on_joints(j2d,
     # - `global_orient_aa` for global orientation in axis-angle
     # Remember to set requires_grad=True for all variables.
     #########################################################
-    # Your code here.
     if conf is not None:
         weights = torch.from_numpy(base_weights * conf[src_ids]).to(DEVICE).float()
     else:
@@ -458,16 +452,14 @@ def optimize_on_joints(j2d,
     else:
         stages = {
             #########################################################
-            # TODO Task 3.5
-            # Adjust the weights for different loss terms.
-            # We recommend you to debug on just one image!
-            # Some hints (assuming w_reproj = 0.01 for all stages):
-            # - You are recommended to leave w_reproj unchanged to measure the the absolute performance of joint matching.
+            # Per-stage loss weights, learning rates and step counts.
+            # Tuning notes (tune on a single image first; w_reproj = 0.01 for all stages):
+            # - w_reproj is kept fixed so the joint-matching error stays comparable across settings.
             # - w_pose can roughly be in the range of 1-10 for the first two stages, 
             #   <1 for the third stage, and even smaller for the fourth stage.
             # - w_angle can be the exact same as w_pose since they can be both counted as some sort of pose prior.
             # - w_betas can be very large in the beginning (recommended range: (1, 100)) and then gradually decreases to 1.
-            # - You can adjust learning rates or number of steps for different stages as you see fit.
+            # - Learning rates and step counts can be set per stage.
             #########################################################
 
             'w_reproj': [0.01,  0.01,  0.01,  0.01],
@@ -503,8 +495,7 @@ def optimize_on_joints(j2d,
         optimizer.param_groups[0]['lr'] = stages['lr'][stage_idx]
         for i in range(steps):
             #########################################################
-            # TODO Task 3.4 (continued)
-            # General steps:
+            # Per-step pose and shape optimization:
             # 1. Convert the global and body pose to rotation matrices (using aa_to_rotmat()).
             # 
             # 2. Call smpl_t to get the 3D joints.
@@ -518,7 +509,6 @@ def optimize_on_joints(j2d,
             # 5. Compute the reprojection loss (Note they are weighted by the joint weights).
             # You can do so by calculating ((projected_joints - j2d_target) ** 2).mean().
             #########################################################
-            # Your code here.
 
             # Losses
             optimizer.zero_grad()
@@ -677,7 +667,7 @@ def run_single_fit(img,
         viz_dir=viz_dir,
         viz_prefix=viz_prefix,
         dataset=dataset)
-    # sys.exit()  # TODO: remove this after you finish Task 3.2
+    # sys.exit()  # debug: stop after camera initialization
 
     # fit
     (fit_out, opt_j2d, losses) = optimize_on_joints(
@@ -820,9 +810,7 @@ def main(img_dir,
             reproj_only=reproj_only)
 
         #########################################################
-        # TODO Task 4.1
-        # You might want to change or adopt the following code to only visualize
-        # the input image overlayed with rendered SMPL mesh.
+        # Visualization: input with ground-truth and fitted 2D joints, and input overlaid with the fitted SMPL mesh.
         #########################################################
         if viz:
             img, joints = scale_img_and_j2d(img, joints, scale_factor)
