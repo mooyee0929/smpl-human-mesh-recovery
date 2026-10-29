@@ -86,7 +86,7 @@ Run these from `hmr2-smplify/`. `track.py` additionally imports the PHALP tracke
 
 ### SMPL model files
 
-The SMPL and SMPLify model files are licensed separately by the Max Planck Institute for Intelligent Systems for non-commercial research use. Register and download them from [smpl.is.tue.mpg.de](https://smpl.is.tue.mpg.de/) and [smplify.is.tue.mpg.de](https://smplify.is.tue.mpg.de/), then place them in `hmr2-smplify/data/`:
+The SMPL and SMPLify model files are licensed separately by the Max Planck Institute for Intelligent Systems for non-commercial research use and are not included in this repository. Register and download them from [smpl.is.tue.mpg.de](https://smpl.is.tue.mpg.de/) and [smplify.is.tue.mpg.de](https://smplify.is.tue.mpg.de/), then place them in `hmr2-smplify/data/`:
 
 ```
 hmr2-smplify/data/
@@ -95,6 +95,8 @@ hmr2-smplify/data/
 ```
 
 HMR 2.0 also looks for the neutral model at `data/basicModel_neutral_lbs_10_207_0_v1.0.0.pkl` and converts it to the format it needs under `~/.cache/4DHumans` automatically.
+
+The reference SMPLify release in `smplify_public/` reads its model files from `smplify_public/code/models/`: the SMPL `basicModel_*_lbs_10_207_0_v1.0.0.pkl` files, plus `gmm_08.pkl` and `regressors_locked_normalized_{female,male,hybrid}.npz` from the SMPLify download. These paths are listed in `.gitignore` so the licensed files are not committed.
 
 ## Usage
 
