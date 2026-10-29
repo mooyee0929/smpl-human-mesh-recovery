@@ -1,12 +1,12 @@
 #!/bin/bash
-#SBATCH --job-name=fsyang_test
-#SBATCH --mail-user=fsyang@umich.edu
+#SBATCH --job-name=hmr2_track
+# For email notifications, pass --mail-user on the sbatch command line.
 #SBATCH --mail-type=BEGIN,END,FAIL
 #SBATCH --cpus-per-task=8
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --output=fsyang_test%j.log
-#SBATCH --error=fsyang_test%j.err
+#SBATCH --output=hmr2_track_%j.log
+#SBATCH --error=hmr2_track_%j.err
 #SBATCH --mem-per-cpu=4G
 #SBATCH --time=01:00:00
 #SBATCH --partition=gpu

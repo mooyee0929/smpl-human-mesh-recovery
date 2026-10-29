@@ -35,9 +35,8 @@ def render_tpose(model_path, out_path, res=512):
     ).to(device)
 
     #########################################################
-    # TODO Task 2.2
-    # Experiment with different betas. A good range for beta
-    # can be in (-2, 2).
+    # Shape coefficients (betas): zeros give the template body;
+    # values in (-2, 2) give plausible shapes.
     #########################################################
     betas = torch.zeros(1, 10, device=device)   # Template
     # betas = torch.tensor([[1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5]], 
@@ -55,10 +54,8 @@ def render_tpose(model_path, out_path, res=512):
     body_pose_aa = torch.zeros(1, 23, 3, device=device)
 
     #########################################################
-    # TODO Task 2.3
-    # Change body_pose_aa here to make the body pose match the target.
+    # Example arm pose (axis-angle rotation per body joint).
     #########################################################
-    # Your code here.
     body_pose_aa[0, 16, 1] = 1.5  # Rotate shoulders
     body_pose_aa[0, 18, 1] = 1.5  # Rotate elbows
 
